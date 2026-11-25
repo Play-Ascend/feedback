@@ -26,10 +26,17 @@ async function linear(query, variables) {
 
 // The team's "Type" labels, so a bug lands as Bug and a feature request as Feature.
 const { team } = await linear(
-  `query($id: String!) { team(id: $id) { labels(first: 250) { nodes { id name parent { name } } } } }`,
+  `query($id: String!) { team(id: $id) { labels(first: 250) { nodes { id name parent { name } } } states { nodes { id name type } } } }`,
   { id: TEAM_ID },
 );
 const typeLabel = (name) => team.labels.nodes.find((l) => l.name === name && l.parent?.name === "Type")?.id;
+
+const canceledStateId = team.states.nodes.find((st) => st.type === "canceled")?.id;
+
+// A post a mod re-tags Off-topic after it was filed: close the issue (not planned) and cancel it in
+// Linear, silently. The post is already tagged or locked, so nothing is posted back to Discord.
+const forum = await discord(`/channels/${env("DISCORD_FORUM_CHANNEL_ID")}`);
+const offTopicTagId = forum.available_tags.find((t) => t.name.toLowerCase() === "off-topic")?.id;
 
 const open = [];
 for (let page = 1; ; page++) {
@@ -43,6 +50,29 @@ let comments = 0, filed = 0, closed = 0;
 
 for (const issue of open) {
   let body = issue.body ?? "";
+  const postId = threadIdFrom(body);
+
+  if (postId && offTopicTagId) {
+    const post = await discord(`/channels/${postId}`).catch(() => null);
+    if (post?.applied_tags?.includes(offTopicTagId)) {
+      if (!DRY_RUN) {
+        await github(`/repos/${REPO}/issues/${issue.number}`, {
+          method: "PATCH",
+          body: JSON.stringify({ state: "closed", state_reason: "not_planned" }),
+        });
+        const linearIdForPost = body.match(LINEAR_RE)?.[1];
+        if (linearIdForPost && canceledStateId) {
+          await linear(`mutation($id: String!, $state: String!) { issueUpdate(id: $id, input: { stateId: $state }) { success } }`, {
+            id: linearIdForPost,
+            state: canceledStateId,
+          }).catch((e) => console.warn(`Closed #${issue.number}, Linear not canceled: ${e.message}`));
+        }
+      }
+      closed++;
+      console.log(`Closed #${issue.number}: post re-tagged Off-topic`);
+      continue;
+    }
+  }
 
   // 1. Follow-up replies from the Discord post (people only; the bots' own lines are skipped).
   const threadId = threadIdFrom(body);
