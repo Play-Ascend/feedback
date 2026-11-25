@@ -60,7 +60,8 @@ for (const thread of threads) {
   ]
     .filter((line) => line !== null)
     .join("\n");
-  const labels = ["discord", "triage", ...productTags.map(labelFor)];
+  // "Bug" / "Idea" tags become the bug / feature labels; the rest are product names.
+  const labels = ["discord", "triage", ...productTags.map((name) => (labelFor(name) === "idea" ? "feature" : labelFor(name)))];
 
   if (DRY_RUN) {
     console.log(`[dry run] would file "${thread.name}" with labels ${labels.join(", ")}`);

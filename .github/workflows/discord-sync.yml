@@ -34,6 +34,9 @@ jobs:
           DISCORD_FORUM_CHANNEL_ID: ${{ vars.DISCORD_FORUM_CHANNEL_ID }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
+      # GitHub's issue list lags a few seconds behind creation; without this the
+      # issues filed in the step above wait a full cycle before reaching Linear.
+      - run: sleep 15
       - run: node scripts/sync-followups-and-linear.mjs
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
