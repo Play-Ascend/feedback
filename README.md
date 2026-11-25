@@ -11,7 +11,7 @@ Search the [open issues](https://github.com/Play-Ascend/feedback/issues) first. 
 
 ## What happens next
 
-We triage every new issue. When something is fixed or closed, the issue closes here and, for Discord posts, the bot says so in your post.
+We triage every new issue. Replies you add to your Discord post are copied here as comments. When something is fixed or closed, the issue closes here and, for Discord posts, the bot says so in your post.
 
 ## Please don't post
 

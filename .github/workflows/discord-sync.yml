@@ -1,4 +1,4 @@
-name: Discord bug reports to issues
+name: Sync Discord, GitHub and Linear
 
 on:
   schedule:
@@ -11,6 +11,7 @@ on:
         default: false
 
 permissions:
+  contents: read
   issues: write
 
 concurrency:
@@ -22,8 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
       - run: node scripts/discord-to-github.mjs
@@ -31,5 +32,14 @@ jobs:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           DISCORD_GUILD_ID: ${{ vars.DISCORD_GUILD_ID }}
           DISCORD_FORUM_CHANNEL_ID: ${{ vars.DISCORD_FORUM_CHANNEL_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+      - run: node scripts/sync-followups-and-linear.mjs
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_FORUM_CHANNEL_ID: ${{ vars.DISCORD_FORUM_CHANNEL_ID }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          LINEAR_TEAM_ID: ${{ vars.LINEAR_TEAM_ID }}
+          LINEAR_LABEL_ID: ${{ vars.LINEAR_LABEL_ID }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DRY_RUN: ${{ inputs.dry_run || 'false' }}

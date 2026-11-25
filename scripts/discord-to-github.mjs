@@ -56,6 +56,7 @@ for (const thread of threads) {
     `Reported in [#bug-reports on the Ascend Discord](${threadUrl})${productTags.length ? ` · ${productTags.join(", ")}` : ""}.`,
     files ? `${files} attachment${files === 1 ? "" : "s"} in the Discord post.` : null,
     marker(thread.id),
+    `<!-- discord-last:${thread.id} -->`,
   ]
     .filter((line) => line !== null)
     .join("\n");
@@ -81,7 +82,7 @@ for (const thread of threads) {
     await discord(`/channels/${thread.id}/messages`, {
       method: "POST",
       body: JSON.stringify({
-        content: `Thanks, this is tracked as **#${issue.number}**: <${issue.html_url}>\nWe'll post here when it's fixed.`,
+        content: `Tracked as [#${issue.number}](<${issue.html_url}>).`,
         allowed_mentions: { parse: [] },
       }),
     });
