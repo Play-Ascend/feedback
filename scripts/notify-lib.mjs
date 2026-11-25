@@ -10,7 +10,7 @@ export async function notifyThread(issue, action) {
 
   const forum = await discord(`/channels/${env("DISCORD_FORUM_CHANNEL_ID")}`);
   const tagId = (name) => forum.available_tags.find((t) => t.name.toLowerCase() === name)?.id;
-  const statusIds = new Set(["tracked", "fixed", "closed"].map(tagId).filter(Boolean));
+  const statusIds = new Set(["tracked", "fixed", "closed", "off-topic"].map(tagId).filter(Boolean));
 
   let content;
   let status;

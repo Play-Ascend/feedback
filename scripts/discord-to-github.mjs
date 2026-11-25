@@ -7,7 +7,9 @@ const GUILD_ID = env("DISCORD_GUILD_ID");
 const REPO = env("GITHUB_REPOSITORY");
 const DRY_RUN = process.env.DRY_RUN === "true";
 // Status tags are set by the bot, not by members.
-const STATUS_TAGS = new Set(["tracked", "fixed", "closed"]);
+const STATUS_TAGS = new Set(["tracked", "fixed", "closed", "off-topic"]);
+// Posts Ascend AI or a mod marked as not a report (questions, off-topic, abuse) are never filed.
+const SKIP_TAGS = new Set(["off-topic", "closed"]);
 
 const forum = await discord(`/channels/${FORUM_ID}`);
 const tagsById = new Map(forum.available_tags.map((t) => [t.id, t]));
@@ -40,6 +42,10 @@ for (const thread of threads) {
   if (!starter || starter.author?.bot) continue;
 
   const tags = (thread.applied_tags ?? []).map((id) => tagsById.get(id)?.name).filter(Boolean);
+  if (thread.thread_metadata?.locked || tags.some((name) => SKIP_TAGS.has(name.toLowerCase()))) {
+    console.log(`Skipped thread ${thread.id}: ${thread.thread_metadata?.locked ? "locked" : "off-topic or closed"}`);
+    continue;
+  }
   const productTags = tags.filter((name) => !STATUS_TAGS.has(name.toLowerCase()));
   // Mentions are rewritten so no Discord ids or names reach the public issue.
   const text = (starter.content || "_No description._")
