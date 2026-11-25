@@ -1,0 +1,28 @@
+name: Feature request
+description: An idea for something Play Ascend should do.
+labels: ["feature", "triage"]
+body:
+  - type: dropdown
+    id: product
+    attributes:
+      label: Product
+      options:
+        - Tracker
+        - Companion
+        - Ascend AI
+        - Esports
+        - Website
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do
+      description: The problem or the moment where you wanted this. That helps more than a finished design.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea

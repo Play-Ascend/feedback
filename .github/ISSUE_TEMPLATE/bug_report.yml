@@ -1,0 +1,46 @@
+name: Bug report
+description: Something in Play Ascend is broken or wrong.
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Issues here are public, so leave out emails, payment details and anything private.
+  - type: dropdown
+    id: product
+    attributes:
+      label: Product
+      options:
+        - Tracker
+        - Companion
+        - Ascend AI
+        - Esports
+        - Website
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What went wrong, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open ...
+        2. Click ...
+        3. See ...
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: The page URL, or the Companion version (Settings → About), or the Discord server for Ascend AI.
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or video
+      description: Drag files in here.
