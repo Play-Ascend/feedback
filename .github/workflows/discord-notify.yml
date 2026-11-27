@@ -10,7 +10,9 @@ permissions:
 jobs:
   notify:
     if: contains(github.event.issue.labels.*.name, 'discord')
-    runs-on: ubuntu-latest
+    # GitHub-hosted jobs are refused while the org's Actions billing is blocked; Blacksmith runs them.
+    # Same pattern as ascend-app (#1277): set vars.LINUX_RUNNER to move back without a code change.
+    runs-on: ${{ vars.LINUX_RUNNER || 'blacksmith-2vcpu-ubuntu-2604' }}
     timeout-minutes: 3
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
